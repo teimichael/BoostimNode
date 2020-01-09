@@ -24,4 +24,10 @@ public class ChatController {
         simpMessagingTemplate.convertAndSendToUser(sessionId, APIConst.PRIVATE_CHANNEL, Response.success(message), SimpMessageHeaderAccessorFactory.getMessageHeaders(sessionId));
         return ResponseCode.SUCCESS;
     }
+
+    @PostMapping(APIConst.SEND_GROUP_MESSAGE + "/{sessionId}")
+    public int sendGroupMessage(@PathVariable("sessionId") String sessionId, @RequestBody Message message) {
+        simpMessagingTemplate.convertAndSendToUser(sessionId, APIConst.GROUP_CHANNEL, Response.success(message), SimpMessageHeaderAccessorFactory.getMessageHeaders(sessionId));
+        return ResponseCode.SUCCESS;
+    }
 }

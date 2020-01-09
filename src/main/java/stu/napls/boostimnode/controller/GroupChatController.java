@@ -7,8 +7,10 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.client.RestTemplate;
 import stu.napls.boostimnode.core.dictionary.APIConst;
 import stu.napls.boostimnode.core.dictionary.ConversationConst;
+import stu.napls.boostimnode.core.dictionary.ResponseCode;
 import stu.napls.boostimnode.core.exception.Assert;
 import stu.napls.boostimnode.core.response.Response;
 import stu.napls.boostimnode.model.Conversation;
@@ -40,6 +42,8 @@ public class GroupChatController {
     @Resource
     private ConversationService conversationService;
 
+    private RestTemplate restTemplate = new RestTemplate();
+
     @MessageMapping("/group/send")
     @SendToUser(APIConst.GROUP_CHANNEL)
     public Response sendGroup(Message message, SimpMessageHeaderAccessor accessor) {
@@ -65,7 +69,9 @@ public class GroupChatController {
             if (receiverSessionId != null) {
                 // Receiver is online
                 if (!receiverSessionId.equals(sender.getSessionId())) {
-                    simpMessagingTemplate.convertAndSendToUser(receiverSessionId, APIConst.GROUP_CHANNEL, Response.success(message), SimpMessageHeaderAccessorFactory.getMessageHeaders(receiverSessionId));
+                    Integer result = restTemplate.postForObject(receiver.getNode().getAddress() + APIConst.SEND_PRIVATE_MESSAGE + "/" + receiver.getSessionId(), message, Integer.class);
+                    Assert.isTrue(result != null && result == ResponseCode.SUCCESS, "Sending failed.");
+//                    simpMessagingTemplate.convertAndSendToUser(receiverSessionId, APIConst.GROUP_CHANNEL, Response.success(message), SimpMessageHeaderAccessorFactory.getMessageHeaders(receiverSessionId));
                 }
             } else {
                 // Receiver is offline
