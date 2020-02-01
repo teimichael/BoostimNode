@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Getter
-public class WebServer {
+public class CenterServer {
 
-    @Value("${webserver.url}")
+    @Value("${centerserver.url}")
     private String url;
 }

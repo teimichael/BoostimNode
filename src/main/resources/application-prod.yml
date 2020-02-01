@@ -10,5 +10,5 @@ authserver:
 appserver:
   url: "*"
 
-webserver:
-  url: http://localhost:8080
+centerserver:
+  url: http://web-center:9510
