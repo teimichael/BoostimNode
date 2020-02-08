@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import stu.napls.boostimnode.auth.annotation.Auth;
+import stu.napls.boostimnode.core.exception.Assert;
 import stu.napls.boostimnode.core.response.Response;
 import stu.napls.boostimnode.model.Conversation;
 import stu.napls.boostimnode.model.User;
@@ -33,8 +34,10 @@ public class ConversationController {
                     required = true, dataType = "string", paramType = "header")})
     @Auth
     @GetMapping("/get/list/{userUuid}")
-    private Response getListByUser(@PathVariable("userUuid") String userUuid, @ApiIgnore HttpSession session) {
-        List<Conversation> conversations = conversationService.findByUserUuid(userUuid);
+    private Response getListByUser(@ApiIgnore HttpSession session) {
+        User user = userService.findUserByUuid(session.getAttribute("uuid").toString());
+        Assert.notNull(user, "User does not exist.");
+        List<Conversation> conversations = conversationService.findByUserUuid(user.getUuid());
         return Response.success(conversations);
     }
 
@@ -44,8 +47,9 @@ public class ConversationController {
                     required = true, dataType = "string", paramType = "header")})
     @Auth
     @PostMapping("/clear/unread")
-    private Response clearUnread(@RequestParam String conversationUuid, @RequestParam String userUuid,@ApiIgnore HttpSession session) {
-        User user = userService.findUserByUuid(userUuid);
+    private Response clearUnread(@RequestParam String conversationUuid, @ApiIgnore HttpSession session) {
+        User user = userService.findUserByUuid(session.getAttribute("uuid").toString());
+        Assert.notNull(user, "User does not exist.");
         user.setUnreadList(ChatUtil.getNewUnreadList(user.getUnreadList(), conversationUuid, ChatUtil.UNREAD_CLEAR));
         userService.update(user);
         return Response.success("Clear successfully.");

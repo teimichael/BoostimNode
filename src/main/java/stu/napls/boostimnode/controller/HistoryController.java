@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 import stu.napls.boostimnode.auth.annotation.Auth;
+import stu.napls.boostimnode.core.exception.Assert;
 import stu.napls.boostimnode.core.response.Response;
+import stu.napls.boostimnode.model.Conversation;
+import stu.napls.boostimnode.service.ConversationService;
 import stu.napls.boostimnode.service.MessageService;
 
 import javax.annotation.Resource;
@@ -23,6 +26,9 @@ public class HistoryController {
     @Resource
     private MessageService messageService;
 
+    @Resource
+    private ConversationService conversationService;
+
     @ApiOperation("Get history of the conversation.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization", value = "Authorization token",
@@ -33,6 +39,10 @@ public class HistoryController {
     @Auth
     @GetMapping("/get/{conversationUuid}")
     private Response getByConversation(@PathVariable("conversationUuid") String conversationUuid, Pageable pageable, @ApiIgnore HttpSession session) {
+        Conversation conversation = conversationService.findByUuid(conversationUuid);
+        Assert.notNull(conversation, "Conversation does not exist.");
+        Assert.isTrue(conversation.getUsers().contains(session.getAttribute("uuid").toString()),"Illegal authorization.");
+
         return Response.success(messageService.findByConversationUuidOrderByTimestamp(conversationUuid, pageable));
     }
 
