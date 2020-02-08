@@ -38,7 +38,7 @@ public class HistoryController {
     })
     @Auth
     @GetMapping("/get/{conversationUuid}")
-    private Response getByConversation(@PathVariable("conversationUuid") String conversationUuid, Pageable pageable, @ApiIgnore HttpSession session) {
+    public Response getByConversation(@PathVariable("conversationUuid") String conversationUuid, Pageable pageable, @ApiIgnore HttpSession session) {
         Conversation conversation = conversationService.findByUuid(conversationUuid);
         Assert.notNull(conversation, "Conversation does not exist.");
         Assert.isTrue(conversation.getUsers().contains(session.getAttribute("uuid").toString()),"Illegal authorization.");
