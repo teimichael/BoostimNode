@@ -69,7 +69,7 @@ public class GroupChatController {
             if (receiverSessionId != null) {
                 // Receiver is online
                 if (!receiverSessionId.equals(sender.getSessionId())) {
-                    Integer result = restTemplate.postForObject(receiver.getNode().getAddress() + APIConst.SEND_PRIVATE_MESSAGE + "/" + receiver.getSessionId(), message, Integer.class);
+                    Integer result = restTemplate.postForObject(receiver.getNode().getAddress() + APIConst.SEND_GROUP_MESSAGE + "/" + receiver.getSessionId(), message, Integer.class);
                     Assert.isTrue(result != null && result == ResponseCode.SUCCESS, "Sending failed.");
 //                    simpMessagingTemplate.convertAndSendToUser(receiverSessionId, APIConst.GROUP_CHANNEL, Response.success(message), SimpMessageHeaderAccessorFactory.getMessageHeaders(receiverSessionId));
                 }
